@@ -33,26 +33,11 @@ jobs:
       - name: Run conversion script
         run: python scripts/csv_to_geojson.py
 
-      - name: Commit and push changes
+      - name: Commit and push changes (always)
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      
-          git checkout main
-          git fetch origin main
-      
-          # Réinitialise le fichier local pour éviter le conflit
-          git reset --hard origin/main
-      
-          # Ajouter le fichier généré
-          git add data.geojson
-      
-          # Commit uniquement si le fichier a changé
-          if ! git diff --cached --quiet; then
-            git commit -m "Update geojson from Google Sheets"
-            git push origin main
-          else
-            echo "No changes to commit"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          git add -A
+          git commit -m "Update geojson from Google Sheets [skip ci]" || echo "Nothing to commit"
+          git push origin main
