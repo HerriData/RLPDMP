@@ -5,6 +5,9 @@ on:
     - cron: "0 * * * *"  # toutes les heures
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update-geojson:
     runs-on: ubuntu-latest
