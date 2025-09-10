@@ -1,1 +1,58 @@
+name: Update GeoJSON from Google Sheets
 
+on:
+  schedule:
+    - cron: "0 * * * *"  # toutes les heures
+  workflow_dispatch:
+
+jobs:
+  update-geojson:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas
+
+      - name: Download Google Sheet CSV
+        run: |
+          curl -L "https://docs.google.com/spreadsheets/d/e/2PACX-1vS5d-xL9FC8paoBntzfmmU9M4wXt3PC7FZ0_xN4bokPoMJjoIiCcrJNhw4fBFg9LKMnzzp3gEmr_Gyc/pub?gid=392242982&single=true&output=csv" -o data.csv
+
+      - name: Run conversion script
+        run: python scripts/csv_to_geojson.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+          git checkout main
+          git fetch origin main
+      
+          # Réinitialise le fichier local pour éviter le conflit
+          git reset --hard origin/main
+      
+          # Ajouter le fichier généré
+          git add data.geojson
+      
+          # Commit uniquement si le fichier a changé
+          if ! git diff --cached --quiet; then
+            git commit -m "Update geojson from Google Sheets"
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
