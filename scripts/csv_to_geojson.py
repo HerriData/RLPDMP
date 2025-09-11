@@ -1,9 +1,12 @@
 import csv
 import json
+import os
 
 def main():
     features = []
-    with open("data.csv", newline="", encoding="utf-8") as csvfile:
+    csv_file = "data.csv"
+
+    with open(csv_file, newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
         for i, row in enumerate(reader, start=1):
             try:
@@ -14,8 +17,6 @@ def main():
 
             # Construire les propriétés (tout sauf X et Y)
             props = {k: (v if v != "" else None) for k, v in row.items() if k not in ("X", "Y")}
-
-            # Ajouter un ID unique
             props["ID"] = i
 
             features.append({
@@ -33,6 +34,13 @@ def main():
         json.dump(geojson, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Fichier data.geojson généré avec {len(features)} points.")
+
+    # --- Supprimer le CSV après usage ---
+    try:
+        os.remove(csv_file)
+        print(f"✅ Fichier {csv_file} supprimé après traitement.")
+    except FileNotFoundError:
+        print(f"⚠️ Fichier {csv_file} non trouvé pour suppression.")
 
 if __name__ == "__main__":
     main()
