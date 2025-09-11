@@ -131,7 +131,7 @@
         "adresse_orig": "17 RUE DE L'ADOUR",
         "nb_inscrits": 2,
         "logements_total": NaN,
-        "etages_moy": NaN
+        "etages_moy": 0.0
       }
     },
     {
@@ -264,7 +264,7 @@
         "adresse_orig": "15 RUE DE L'ADOUR",
         "nb_inscrits": 1,
         "logements_total": 0.0,
-        "etages_moy": NaN
+        "etages_moy": 0.0
       }
     },
     {
@@ -2696,7 +2696,7 @@
         "adresse_orig": "34 ALLÉES MARINES",
         "nb_inscrits": 2,
         "logements_total": 0.0,
-        "etages_moy": NaN
+        "etages_moy": 0.0
       }
     },
     {
