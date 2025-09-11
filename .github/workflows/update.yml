@@ -4,7 +4,7 @@ name: Update GeoJSON from Google Sheets
 # Déclencheurs
 on:
   schedule:
-    - cron: "0 * * * *"   # toutes les heures
+#    - cron: "0 * * * *"   # toutes les heures
   workflow_dispatch:      # permet de lancer manuellement
 
 # Permissions pour push
