@@ -33,7 +33,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pandas
 
       # 3. Télécharger le CSV depuis Google Sheets
       - name: Download Google Sheet CSV
