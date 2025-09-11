@@ -1,24 +1,29 @@
+
 name: Update GeoJSON from Google Sheets
 
+# Déclencheurs
 on:
   schedule:
-    - cron: "0 * * * *"  # toutes les heures
-  workflow_dispatch:
+    - cron: "0 * * * *"   # toutes les heures
+  workflow_dispatch:      # permet de lancer manuellement
 
+# Permissions pour push
 permissions:
   contents: write
 
 jobs:
-  update-geojson:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Récupérer le code
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           persist-credentials: true
 
+      # 2. Installer Python et Pandas
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -29,27 +34,30 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas
 
+      # 3. Télécharger le CSV depuis Google Sheets
       - name: Download Google Sheet CSV
         run: |
           curl -L "https://docs.google.com/spreadsheets/d/e/2PACX-1vS5d-xL9FC8paoBntzfmmU9M4wXt3PC7FZ0_xN4bokPoMJjoIiCcrJNhw4fBFg9LKMnzzp3gEmr_Gyc/pub?gid=392242982&single=true&output=csv" -o data.csv
 
+      # 4. Supprimer l’ancien GeoJSON
+      - name: Clean old GeoJSON
+        run: rm -f data.geojson
+
+      # 5. Générer le GeoJSON
       - name: Run conversion script
         run: python scripts/csv_to_geojson.py
 
+      # 6. Commit et push
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # S'assurer d'être sur la branche main
-          git fetch origin main
-          git checkout main
-          git pull origin main --rebase
-
-          # Supprimer l'ancien fichier avant de régénérer
-          rm -f data.geojson
-
-          # Ajouter tous les fichiers modifiés (y compris le nouveau geojson)
           git add -A
           git commit -m "Update geojson from Google Sheets [skip ci]" || echo "No changes"
+
+          # Synchroniser avec main avant push pour éviter les conflits
+          git fetch origin main
+          git pull origin main --rebase || true
+
           git push origin main
